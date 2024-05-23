@@ -25,7 +25,7 @@ public class ZLinterTest {
         try {
             lintResult = ZLinter.lint(new File(ZLinterTest.class.getResource("./www_sc_com.cer").getPath()).toString(), ZLinter.Format.pem);
         } catch (ZLintException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             e.printStackTrace();
             Assertions.fail(e.getMessage());
         }
