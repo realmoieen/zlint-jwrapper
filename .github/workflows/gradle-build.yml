@@ -14,6 +14,8 @@ on:
   #      branches: [ "main" ]
   workflow_dispatch:
   workflow_call:
+  release:
+    types: [ created ]
 
 jobs:
   build-linux:
@@ -76,7 +78,7 @@ jobs:
 
   build-win:
     runs-on: windows-latest
-
+    needs: build-linux
     permissions:
       contents: write
       packages: write
