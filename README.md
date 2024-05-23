@@ -1,4 +1,4 @@
-[![Gradle Build](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/gradle-build.yml)  [![Gradle Release](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/release.yml/badge.svg)](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/release.yml)
+[![Build](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/gradle-build.yml)  [![Release](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/gradle-build.yml)
 # Zlint jWrapper
 
 ## Overview
