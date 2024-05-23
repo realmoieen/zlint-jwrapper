@@ -16,19 +16,12 @@ public class ZLinterTest {
 
     @Order(2)
     @Test
-    public void testValid() {
+    public void testValid() throws ZLintException {
         //first set the ZLint path
         ZLinter.setZlintPath(new File(ZLinterTest.class.getResource("./zlint").getPath()).toString());
 
         //Lint certificate,crl
-        LintResult lintResult = null;
-        try {
-            lintResult = ZLinter.lint(new File(ZLinterTest.class.getResource("./www_sc_com.cer").getPath()).toString(), ZLinter.Format.pem);
-        } catch (ZLintException e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-            Assertions.fail(e.getMessage());
-        }
+        LintResult lintResult = ZLinter.lint(new File(ZLinterTest.class.getResource("./www_sc_com.cer").getPath()).toString(), ZLinter.Format.pem);
 
         //validate result
         Assertions.assertTrue(lintResult.isPassed());
