@@ -17,15 +17,11 @@ on:
     types: [ created ]
 
 jobs:
-  build:
+  setup:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-
-    permissions:
-      contents: write
-      packages: write
 
     steps:
       - name: Check out source code
@@ -41,6 +37,18 @@ jobs:
             *.gradle*
             **/gradle-wrapper.properties
 
+  build-linux:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+      checks: write
+      # only needed unless run with comment_mode: off
+      pull-requests: write
+
+    steps:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
@@ -54,29 +62,11 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: reports
+          name: test-reports-linux
           path: |
             **/build/reports/
             **/build/test-results/
 
-  publish-test-results:
-    name: "Publish Tests Results"
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      checks: write
-
-      # only needed unless run with comment_mode: off
-      pull-requests: write
-
-      # only needed for private repository
-      #      contents: read
-
-      # only needed for private repository
-    #      issues: read
-    if: always()
-
-    steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -84,6 +74,45 @@ jobs:
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
+        check_name: "Junit Linux Test Report"
+        with:
+          files: |
+            **/test-results/**/*.xml
+            **/test-results/**/*.trx
+            **/test-results/**/*.json
+
+  build-win:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+      checks: write
+      # only needed unless run with comment_mode: off
+      pull-requests: write
+
+    steps:
+      - name: Gradle Build started
+        run: ./gradlew clean build --no-daemon
+
+      - name: Store reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports-window
+          path: |
+            **/build/reports/
+            **/build/test-results/
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        check_name: "Junit Windows Test Report"
         with:
           files: |
             **/test-results/**/*.xml
@@ -92,7 +121,7 @@ jobs:
 
   release:
     name: "Release"
-    needs: build
+    needs: [ build-linux, build-win ]
     runs-on: windows-latest
     permissions:
       contents: write
