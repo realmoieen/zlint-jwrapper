@@ -8,10 +8,10 @@
 name: Gradle Build
 
 on:
-#  push:
-#    branches: [ "main" ]
-#    pull_request:
-#      branches: [ "main" ]
+  #  push:
+  #    branches: [ "main" ]
+  #    pull_request:
+  #      branches: [ "main" ]
   workflow_dispatch:
   workflow_call:
 
@@ -46,10 +46,10 @@ jobs:
       - name: Make zlint executable
         run: chmod +x ./src/test/resources/zlint/zlint
 
-#      - name: Run Zlint sample
-#        run:  |
-#          cd src/test/resources/zlint
-#          ./zlint -pretty "../www_sc_com.cer"
+      #      - name: Run Zlint sample
+      #        run:  |
+      #          cd src/test/resources/zlint
+      #          ./zlint -pretty "../www_sc_com.cer"
 
       - name: Gradle Build started
         run: ./gradlew clean build --no-daemon
@@ -120,3 +120,15 @@ jobs:
         with:
           check_name: "Junit Windows Test Report"
           report_paths: '**/build/test-results/test/TEST-*.xml'
+
+        # upload to release to tag
+      - name: Update Release to Github Releses
+        uses: softprops/action-gh-release@v2
+        # only if this is exectued on tag/release
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: build/libs/*.jar
+
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}

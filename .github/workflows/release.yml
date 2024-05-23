@@ -19,14 +19,3 @@ jobs:
 
     steps:
       - uses: ./.github/workflows/gradle-build.yml
-      # upload to release to tag
-      - name: Update Release to Github Releses
-        uses: softprops/action-gh-release@v2
-        # only if this is exectued on tag/release
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: build/libs/*.jar
-
-        env:
-          USERNAME: ${{ github.actor }}
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
