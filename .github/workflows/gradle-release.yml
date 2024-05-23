@@ -55,6 +55,15 @@ jobs:
         with:
           files: build/libs/*.jar
 
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            test-results/**/*.xml
+            test-results/**/*.trx
+            test-results/**/*.json
+
         env:
           USERNAME: ${{ github.actor }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -83,6 +92,14 @@ jobs:
       - name: Gradle Build started
         run: ./gradlew clean build --no-daemon
 
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/windows@v2
+        if: always()
+        with:
+          files: |
+            test-results\**\*.xml
+            test-results\**\*.trx
+            test-results\**\*.json
         env:
           USERNAME: ${{ github.actor }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
