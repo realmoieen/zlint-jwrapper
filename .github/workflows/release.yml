@@ -5,25 +5,20 @@ on:
     types: [ created ]
 
 jobs:
-  build:
+  release:
+    name: "Release"
+    runs-on: windows-latest
     permissions:
       contents: write
       packages: write
       checks: write
       # only needed unless run with comment_mode: off
       pull-requests: write
-    uses: ./.github/workflows/gradle-build.yml
-  release:
-    name: "Release"
-    needs: build
-    runs-on: windows-latest
-    permissions:
-      contents: write
-      packages: write
 
     if: success()
 
     steps:
+      - uses: ./.github/workflows/gradle-build.yml
       # upload to release to tag
       - name: Update Release to Github Releses
         uses: softprops/action-gh-release@v2
