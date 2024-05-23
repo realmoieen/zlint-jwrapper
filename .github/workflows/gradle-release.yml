@@ -44,6 +44,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Make zlint executable
+        run: chmod +x ./src/test/resources/zlint/zlint
+
       - name: Gradle Build started
         run: ./gradlew clean build --no-daemon
 
