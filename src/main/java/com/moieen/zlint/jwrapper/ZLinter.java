@@ -138,7 +138,7 @@ public class ZLinter {
             command = "cmd /c " + inputCommand;
         } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
             // Command for Linux/Unix/Mac
-            command = "/bin/sh " + inputCommand;
+            command = "./" + inputCommand;
         } else {
             throw new ZLintException("Unsupported OS to Lint");
         }
