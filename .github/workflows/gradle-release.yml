@@ -47,6 +47,11 @@ jobs:
       - name: Make zlint executable
         run: chmod +x ./src/test/resources/zlint/zlint
 
+      - name: Run Zlint sample
+        run:  |
+          cd src/test/resources/zlint
+          ./zlint -pretty ..\www_sc_com.cer
+
       - name: Gradle Build started
         run: ./gradlew clean build --no-daemon
 
