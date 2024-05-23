@@ -5,7 +5,7 @@
 # This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
 
-name: Gradle Build and Release
+name: Gradle Build
 
 on:
   push:
@@ -13,8 +13,14 @@ on:
     pull_request:
       branches: [ "main" ]
   workflow_dispatch:
-  release:
-    types: [ created ]
+  workflow_call:
+    inputs:
+      config-path:
+        required: true
+        type: string
+    secrets:
+      token:
+        required: true
 
 jobs:
   build-linux:
@@ -121,26 +127,3 @@ jobs:
         with:
           check_name: "Junit Windows Test Report"
           report_paths: '**/build/test-results/test/TEST-*.xml'
-
-  release:
-    name: "Release"
-    needs: [ build-linux, build-win ]
-    runs-on: windows-latest
-    permissions:
-      contents: write
-      packages: write
-
-    if: success()
-
-    steps:
-      # upload to release to tag
-      - name: Update Release to Github Releses
-        uses: softprops/action-gh-release@v2
-        # only if this is exectued on tag/release
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: build/libs/*.jar
-
-        env:
-          USERNAME: ${{ github.actor }}
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
