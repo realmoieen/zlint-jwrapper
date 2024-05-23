@@ -41,7 +41,11 @@ jobs:
             *.gradle*
             **/gradle-wrapper.properties
 
-      - run: ./gradlew clean build --no-daemon
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Gradle Build started
+        run: ./gradlew clean build --no-daemon
 
       # upload to release to tag
       - name: Update Release to Github Releses
