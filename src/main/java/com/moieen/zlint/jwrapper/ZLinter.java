@@ -15,9 +15,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Main Class which is used to lint certificate, CRLs and OCSP responses.
+ */
 public class ZLinter {
     private static final Logger LOGGER = Logger.getLogger(ZLinter.class.getName());
     private static String ZLINT_PATH;
+    private static boolean LOG_EXECUTED_COMMANDS;
     /**
      * Contains the list of predefined lints
      */
@@ -33,14 +37,33 @@ public class ZLinter {
     }
 
     /**
+     * Return the flag either executed command to be logged at INFO level. for Debugging purpose only
+     * use {@link #setLogExecutedCommands(boolean)} if need
+     *
+     * @return return boolean value. default value is true
+     */
+    public static boolean isLogExecutedCommands() {
+        return LOG_EXECUTED_COMMANDS;
+    }
+
+    /**
+     * Set true of executed command to be logged at INFO level. for Debugging purpose only
+     *
+     * @param logExecutedCommands
+     */
+    public static void setLogExecutedCommands(boolean logExecutedCommands) {
+        LOG_EXECUTED_COMMANDS = logExecutedCommands;
+    }
+
+    /**
      * run the lint command and return {@link LintResult}
      *
-     * @param command
+     * @param parameter give parameters for lint. the certificate or crl name must be given in last
      * @return
      * @throws ZLintException
      */
-    private static LintResult lint(String command) throws ZLintException {
-        String s = runCommand(command);
+    private static LintResult lint(String... parameter) throws ZLintException {
+        String s = runZlintCommand(parameter);
         LinkedTreeMap<String, LinkedTreeMap<String, String>> linkedTreeMap = new Gson().fromJson(s, LinkedTreeMap.class);
         Collection<Lint> allLintDetails = getAvailableLints();
         Collection<Lint> appliedLints = new ArrayList<>();
@@ -68,8 +91,7 @@ public class ZLinter {
      * @throws ZLintException
      */
     public static LintResult lint(String fileToLint, Format format) throws ZLintException {
-        String command = "zlint -pretty -format " + format.name() + " \"" + fileToLint + "\"";
-        return lint(command);
+        return lint("-pretty", "-format", format.name(), fileToLint);
     }
 
     /**
@@ -85,8 +107,7 @@ public class ZLinter {
         if (includeSources.length < 0) {
             return lint(fileToLint, format);
         }
-        String command = "zlint -pretty -includeSources " + Arrays.stream(includeSources).map(Enum::name).collect(Collectors.joining(",")) + " -format " + format.name() + " \"" + fileToLint + "\"";
-        return lint(command);
+        return lint("-pretty", "-includeSources", Arrays.stream(includeSources).map(Enum::name).collect(Collectors.joining(",")), "-format", format.name(), fileToLint);
     }
 
     /**
@@ -126,26 +147,33 @@ public class ZLinter {
     /**
      * Runs the command
      *
-     * @param inputCommand
+     * @param parameter give parameters for lint. the certificate or crl name must be given in last
      * @return
      * @throws ZLintException
      */
-    private static String runCommand(String inputCommand) throws ZLintException {
+    private static String runZlintCommand(String... parameter) throws ZLintException {
         String os = System.getProperty("os.name").toLowerCase();
         String command;
+        List<String> listCommands = new ArrayList<>();
         if (os.contains("win")) {
             // Command for Windows
-            command = "cmd /c " + inputCommand;
+            listCommands.add("cmd");
+            listCommands.add("/c");
+            listCommands.add("zlint");
         } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
             // Command for Linux/Unix/Mac
-            command = "./" + inputCommand;
+            listCommands.add("./zlint");
         } else {
             throw new ZLintException("Unsupported OS to Lint");
         }
-
+        if (parameter.length > 0) {
+            listCommands.addAll(Arrays.asList(parameter));
+        }
         try {
+            LOGGER.log(Level.INFO, "Command: " + String.join(" ", listCommands));
             // Create a ProcessBuilder
-            ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
+            ProcessBuilder processBuilder = new ProcessBuilder(listCommands);
+
             if (ZLINT_PATH != null) {
                 // Set the working directory
                 processBuilder.directory(new File(ZLINT_PATH));
@@ -190,8 +218,7 @@ public class ZLinter {
      */
     public static Collection<Lint> getAvailableLints() throws ZLintException {
         if (lintDetails == null) {
-            String command = "zlint -list-lints-json";
-            String result = runCommand(command);
+            String result = runZlintCommand("-list-lints-json");
             lintDetails = new ArrayList<>();
             String[] split = result.split("\n");
             for (String s : split) {
