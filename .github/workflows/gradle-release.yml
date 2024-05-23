@@ -74,8 +74,8 @@ jobs:
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
-        check_name: "Junit Linux Test Report"
         with:
+          check_name: "Junit Linux Test Report"
           files: |
             **/test-results/**/*.xml
             **/test-results/**/*.trx
@@ -112,8 +112,8 @@ jobs:
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
-        check_name: "Junit Windows Test Report"
         with:
+          check_name: "Junit Windows Test Report"
           files: |
             **/test-results/**/*.xml
             **/test-results/**/*.trx
