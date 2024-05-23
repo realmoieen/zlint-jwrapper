@@ -1,3 +1,4 @@
+[![Gradle Build and Release](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/gradle-release.yml/badge.svg?branch=main)](https://github.com/realmoieen/zlint-jwrapper/actions/workflows/gradle-release.yml)
 # Zlint jWrapper
 
 ## Overview

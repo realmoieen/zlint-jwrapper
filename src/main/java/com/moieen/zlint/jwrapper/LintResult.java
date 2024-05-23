@@ -56,7 +56,7 @@ public class LintResult {
      * @return
      */
     public boolean isPassed() {
-        return lints.stream().anyMatch(getErrorLintPredicate());
+        return lints.stream().noneMatch(getErrorLintPredicate());
     }
 
     /**
